@@ -22,14 +22,13 @@ export default function HeroSection() {
     <section className="relative overflow-hidden bg-brown-deep">
       {/* ===== MOBILE: photo on top + content below ===== */}
       <div className="lg:hidden">
-        {/* Mobile photo — dynamically positioned */}
+        {/* Mobile photo — cropped version for mobile */}
         <div className="relative w-full" style={{ height: "clamp(260px, 42vh, 400px)" }}>
           <Image
-            src="/images/hero-chef.png"
+            src="/images/hero-chef-mobile.png"
             alt="Yasemin — Gastronomi Şefi"
             fill
-            className="object-cover"
-            style={{ objectPosition: "80% 20%" }}
+            className="object-cover object-center"
             priority
             sizes="100vw"
           />
