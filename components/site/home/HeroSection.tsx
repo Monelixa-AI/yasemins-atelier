@@ -29,7 +29,7 @@ export default function HeroSection() {
             alt="Yasemin — Gastronomi Şefi"
             fill
             className="object-cover"
-            style={{ objectPosition: "60% 20%" }}
+            style={{ objectPosition: "80% 20%" }}
             priority
             sizes="100vw"
           />
