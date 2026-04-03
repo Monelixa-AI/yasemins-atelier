@@ -9,7 +9,10 @@
       "Bash(node -e \"const l = require\\('lucide-react'\\); console.log\\('Instagram:', !!l.Instagram\\); console.log\\('Youtube:', !!l.Youtube\\); const names = Object.keys\\(l\\).filter\\(k => k.toLowerCase\\(\\).includes\\('instagram'\\) || k.toLowerCase\\(\\).includes\\('youtube'\\)\\); console.log\\(names\\);\")",
       "Bash(taskkill /F /IM node.exe)",
       "Bash(netstat -ano)",
-      "Bash(taskkill //F //PID 60260)"
+      "Bash(taskkill //F //PID 60260)",
+      "Bash(grep -rl \"\\\\\\\\\\\\\\\\u0131\\\\|\\\\\\\\\\\\\\\\u00FC\\\\|\\\\\\\\\\\\\\\\u011F\\\\|\\\\\\\\\\\\\\\\u00E7\\\\|\\\\\\\\\\\\\\\\u015F\\\\|\\\\\\\\\\\\\\\\u00F6\\\\|\\\\\\\\\\\\\\\\u0130\\\\|\\\\\\\\\\\\\\\\u00DC\" components/site/naturel/)",
+      "Bash(node -e ':*)",
+      "Bash(node scripts/fix-unicode.js)"
     ]
   }
 }

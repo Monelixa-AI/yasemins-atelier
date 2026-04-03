@@ -5,9 +5,9 @@ import { Check } from "lucide-react";
 import ImagePlaceholder from "@/components/site/ui/ImagePlaceholder";
 
 const checkItems = [
-  "Her \u00FCr\u00FCn\u00FC bizzat kendisi test eder",
-  "Sadece mevsiminde, yerel \u00FCreticilerden tedarik",
-  "Hi\u00E7bir koruyucu veya aroma kullanmaz",
+  "Her ürünü bizzat kendisi test eder",
+  "Sadece mevsiminde, yerel üreticilerden tedarik",
+  "Hiçbir koruyucu veya aroma kullanmaz",
 ];
 
 export default function NaturelManifesto() {
@@ -35,7 +35,7 @@ export default function NaturelManifesto() {
               style={{ backgroundColor: "#2D4A1E" }}
             >
               <p className="font-heading text-[17px] text-white italic leading-relaxed">
-                &ldquo;Eline ald\u0131\u011F\u0131n \u00FCr\u00FCn\u00FCn i\u00E7indekiler listesini okumak zorunda kalmamal\u0131s\u0131n.&rdquo;
+                &ldquo;Eline aldığın ürünün içindekiler listesini okumak zorunda kalmamalısın.&rdquo;
               </p>
               <p className="font-body text-[11px] text-white/60 mt-3 uppercase tracking-wider">
                 &mdash; Yasemin
@@ -55,31 +55,31 @@ export default function NaturelManifesto() {
               className="font-body text-[10px] font-medium uppercase tracking-[0.2em] mb-3"
               style={{ color: "#4A7C3F" }}
             >
-              NATUREL MAN\u0130FESTO
+              NATUREL MANİFESTO
             </p>
 
             {/* Heading */}
             <h2 className="font-heading text-[36px] md:text-[48px] font-semibold text-brown-deep leading-tight italic">
-              Bir etiketi okumak zorunda kalmamal\u0131s\u0131n\u0131z.
+              Bir etiketi okumak zorunda kalmamalısınız.
             </h2>
 
             {/* Paragraphs */}
             <div className="mt-6 space-y-4">
               <p className="font-body text-[15px] text-brown-deep/80 leading-relaxed">
-                Market raflar\u0131ndaki \u00FCr\u00FCnlerin \u00E7o\u011Fu, i\u00E7indekiler listesinde
-                tan\u0131yamayaca\u011F\u0131n\u0131z onlarca madde bar\u0131nd\u0131r\u0131r. Koruyucular,
-                yapay aromalar, stabilizat\u00F6rler... Bunlar\u0131n hi\u00E7biri sofralar\u0131m\u0131za ait
-                de\u011Fil.
+                Market raflarındaki ürünlerin çoğu, içindekiler listesinde
+                tanıyamayacağınız onlarca madde barındırır. Koruyucular,
+                yapay aromalar, stabilizatörler... Bunların hiçbiri sofralarımıza ait
+                değil.
               </p>
               <p className="font-body text-[15px] text-brown-deep/80 leading-relaxed">
-                Naturel, bu duruma bir alternatif olarak do\u011Fdu. Her \u00FCr\u00FCn\u00FCm\u00FCzde
-                sadece bildi\u011Finiz, tan\u0131d\u0131\u011F\u0131n\u0131z malzemeler var. Yulaf, bal,
-                f\u0131nd\u0131k, tar\u00E7\u0131n &mdash; hepsi bu kadar.
+                Naturel, bu duruma bir alternatif olarak doğdu. Her ürünümüzde
+                sadece bildiğiniz, tanıdığınız malzemeler var. Yulaf, bal,
+                fındık, tarçın &mdash; hepsi bu kadar.
               </p>
               <p className="font-body text-[15px] text-brown-deep/80 leading-relaxed">
-                \u00C7ocuklar\u0131n\u0131za g\u00F6n\u00FCl rahatl\u0131\u011F\u0131yla verebilece\u011Finiz,
-                ailenizle payla\u015Fabilece\u011Finiz lezzetler. Daha az\u0131 ger\u00E7ekten daha
-                \u00E7oktur.
+                Çocuklarınıza gönül rahatlığıyla verebileceğiniz,
+                ailenizle paylaşabileceğiniz lezzetler. Daha azı gerçekten daha
+                çoktur.
               </p>
             </div>
 

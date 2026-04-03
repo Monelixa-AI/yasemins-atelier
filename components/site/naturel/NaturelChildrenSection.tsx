@@ -6,10 +6,10 @@ import { Check } from "lucide-react";
 import ImagePlaceholder from "@/components/site/ui/ImagePlaceholder";
 
 const products = [
-  "Mini Sebzeli Krakerler \u2014 Havuc\u0327, \u0131spanak, pancar",
-  "Meyve Toplar\u0131 \u2014 \u015Eekersiz, hurma bazl\u0131",
-  "\u00C7ocuk Patlam\u0131\u015F M\u0131s\u0131r \u2014 Hafif tuzlu veya ball\u0131",
-  "Meyveli Granola Bar \u2014 Pratik at\u0131\u015Ft\u0131rmal\u0131k",
+  "Mini Sebzeli Krakerler — Havuç, ıspanak, pancar",
+  "Meyve Topları — Şekersiz, hurma bazlı",
+  "Çocuk Patlamış Mısır — Hafif tuzlu veya ballı",
+  "Meyveli Granola Bar — Pratik atıştırmalık",
 ];
 
 export default function NaturelChildrenSection() {
@@ -27,7 +27,7 @@ export default function NaturelChildrenSection() {
           >
             <ImagePlaceholder
               aspectRatio="aspect-[3/4]"
-              label="\u00C7ocuk Serisi"
+              label="Çocuk Serisi"
               className="w-full"
             />
 
@@ -36,7 +36,7 @@ export default function NaturelChildrenSection() {
               className="absolute top-6 right-6 px-4 py-2.5 rounded-full shadow-lg font-body text-[13px] font-medium"
               style={{ backgroundColor: "#A8D5A2", color: "#2D4A1E" }}
             >
-              \uD83D\uDC76 1 Ya\u015F+ G\u00FCvenli
+              \uD83D\uDC76 1 Yaş+ Güvenli
             </div>
           </motion.div>
 
@@ -52,19 +52,19 @@ export default function NaturelChildrenSection() {
               className="font-body text-[10px] font-medium uppercase tracking-[0.2em] mb-3"
               style={{ color: "#A8D5A2" }}
             >
-              \u00C7OCUK SER\u0130S\u0130
+              ÇOCUK SERİSİ
             </p>
 
             {/* Heading */}
             <h2 className="font-heading text-[36px] md:text-[52px] font-semibold text-white leading-tight">
-              \u00C7ocu\u011Funuza g\u00FCvenle verebilece\u011Finiz lezzetler.
+              Çocuğunuza güvenle verebileceğiniz lezzetler.
             </h2>
 
             {/* Paragraph */}
             <p className="font-body text-[15px] text-white/70 leading-relaxed mt-5 max-w-lg">
-              T\u00FCm \u00E7ocuk serisi \u00FCr\u00FCnlerimiz, katk\u0131 maddesi i\u00E7ermez, yapay
-              \u015Feker eklenmez ve pediatrist dan\u0131\u015Fmanl\u0131\u011F\u0131nda
-              geli\u015Ftirilmi\u015Ftir. K\u00FC\u00E7\u00FCk paketlerde, k\u00FC\u00E7\u00FCk eller i\u00E7in.
+              Tüm çocuk serisi ürünlerimiz, katkı maddesi içermez, yapay
+              şeker eklenmez ve pediatrist danışmanlığında
+              geliştirilmiştir. Küçük paketlerde, küçük eller için.
             </p>
 
             {/* Product List */}
@@ -90,7 +90,7 @@ export default function NaturelChildrenSection() {
               className="inline-flex items-center justify-center font-body text-sm font-semibold px-8 py-4 mt-10 transition-colors duration-300 hover:opacity-90"
               style={{ backgroundColor: "#A8D5A2", color: "#2D4A1E" }}
             >
-              \u00C7ocuk Serisini G\u00F6r \u2192
+              Çocuk Serisini Gör →
             </Link>
           </motion.div>
         </div>

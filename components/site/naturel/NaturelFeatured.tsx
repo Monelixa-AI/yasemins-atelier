@@ -11,7 +11,7 @@ export default function NaturelFeatured() {
     <section className="py-20" style={{ backgroundColor: "#F5F0E8" }}>
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <SectionHeader
-          eyebrow="\u00D6NC\u00DC \u00DCR\u00DCNLER"
+          eyebrow="ÖNCÜ ÜRÜNLER"
           title="Yasemin'in Favorileri"
         />
 

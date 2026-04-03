@@ -118,7 +118,7 @@ export default function NaturelProductCard({ product }: NaturelProductCardProps)
           className="font-heading text-[22px] font-bold mt-2"
           style={{ color: "#C4622D" }}
         >
-          {product.basePrice}\u20BA
+          {product.basePrice}₺
         </p>
 
         {/* Add to Cart Button */}
@@ -138,7 +138,7 @@ export default function NaturelProductCard({ product }: NaturelProductCardProps)
 
         {/* Cargo Note */}
         <p className="font-body text-[11px] text-brown-deep/50 text-center mt-2">
-          \uD83D\uDE9A 750\u20BA \u00FCzeri \u00FCcretsiz kargo
+          \uD83D\uDE9A 750₺ üzeri ücretsiz kargo
         </p>
       </div>
     </div>

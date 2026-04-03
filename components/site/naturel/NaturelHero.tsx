@@ -29,7 +29,7 @@ export default function NaturelHero() {
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <span className="inline-block font-body text-[11px] text-white px-4 py-2 rounded-full bg-white/10 border border-white/20">
-                \uD83C\uDF3F 100% Katk\u0131s\u0131z &middot; El Yap\u0131m\u0131 &middot; T\u00FCrkiye Geneli
+                \uD83C\uDF3F 100% Katkısız · El Yapımı · Türkiye Geneli
               </span>
             </motion.div>
 
@@ -40,9 +40,9 @@ export default function NaturelHero() {
               transition={{ duration: 0.7, delay: 0.4 }}
               className="mt-6 font-heading text-[48px] sm:text-[64px] lg:text-[82px] font-semibold leading-[1.05]"
             >
-              <span className="text-white italic">Do\u011Fadan Sofraya,</span>
+              <span className="text-white italic">Doğadan Sofraya,</span>
               <br />
-              <span style={{ color: "#A8D5A2" }}>Sevgiyle Haz\u0131rlanm\u0131\u015F.</span>
+              <span style={{ color: "#A8D5A2" }}>Sevgiyle Hazırlanmış.</span>
             </motion.h1>
 
             {/* Subtitle */}
@@ -52,9 +52,9 @@ export default function NaturelHero() {
               transition={{ duration: 0.7, delay: 0.6 }}
               className="font-body text-[17px] text-white/75 leading-[1.8] mt-5 max-w-lg"
             >
-              Katk\u0131 maddesi i\u00E7ermeyen, el yap\u0131m\u0131 at\u0131\u015Ft\u0131rmal\u0131klar.
-              Granola, kurabiye, \u00E7ocuk serisi ve do\u011Fal soslar.
-              Yasemin&apos;in mutfa\u011F\u0131ndan, sofralar\u0131n\u0131za.
+              Katkı maddesi içermeyen, el yapımı atıştırmalıklar.
+              Granola, kurabiye, çocuk serisi ve doğal soslar.
+              Yasemin&apos;in mutfağından, sofralarınıza.
             </motion.p>
 
             {/* Feature Icons */}
@@ -65,15 +65,15 @@ export default function NaturelHero() {
               className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-6"
             >
               <span className="font-body text-[13px] text-white/70">
-                \uD83C\uDF3F Katk\u0131 Maddesi Yok
+                \uD83C\uDF3F Katkı Maddesi Yok
               </span>
               <span className="text-white/30">|</span>
               <span className="font-body text-[13px] text-white/70">
-                \uD83D\uDC76 \u00C7ocuklar \u0130\u00E7in G\u00FCvenli
+                \uD83D\uDC76 Çocuklar İçin Güvenli
               </span>
               <span className="text-white/30">|</span>
               <span className="font-body text-[13px] text-white/70">
-                \uD83D\uDCE6 T\u00FCrkiye Geneli Kargo
+                \uD83D\uDCE6 Türkiye Geneli Kargo
               </span>
             </motion.div>
 
@@ -89,7 +89,7 @@ export default function NaturelHero() {
                 className="inline-flex items-center justify-center font-body text-sm font-medium tracking-wide text-white px-8 py-4 transition-colors duration-300 hover:opacity-90"
                 style={{ backgroundColor: "#4A7C3F" }}
               >
-                \u00DCr\u00FCnleri Ke\u015Ffet \u2192
+                Ürünleri Keşfet →
               </Link>
               <Link
                 href="/urunler/naturel-hediye-kutusu"
@@ -140,7 +140,7 @@ export default function NaturelHero() {
               <div className="relative z-10 ml-8">
                 <ImagePlaceholder
                   aspectRatio="aspect-[3/4]"
-                  label="Naturel \u00DCr\u00FCnler"
+                  label="Naturel Ürünler"
                   className="w-full rounded-sm overflow-hidden"
                 />
               </div>
@@ -158,7 +158,7 @@ export default function NaturelHero() {
               <div className="absolute -bottom-6 -left-4 z-20 w-[40%]">
                 <ImagePlaceholder
                   aspectRatio="aspect-[4/3]"
-                  label="\u00C7ocuk Serisi"
+                  label="Çocuk Serisi"
                   className="w-full rounded-sm overflow-hidden shadow-2xl"
                 />
               </div>
@@ -168,7 +168,7 @@ export default function NaturelHero() {
                 className="absolute top-1/2 -left-2 z-30 px-4 py-2 rounded-full shadow-lg font-body text-[12px] font-medium text-white"
                 style={{ backgroundColor: "#4A7C3F" }}
               >
-                \u2713 Yasemin Tarifi
+                ✓ Yasemin Tarifi
               </div>
             </div>
           </motion.div>
@@ -182,14 +182,14 @@ export default function NaturelHero() {
           >
             <ImagePlaceholder
               aspectRatio="aspect-[4/3]"
-              label="Naturel \u00DCr\u00FCnler"
+              label="Naturel Ürünler"
               className="w-full rounded-sm overflow-hidden"
             />
             <div
               className="absolute bottom-4 right-4 px-4 py-2 rounded-full shadow-lg font-body text-[12px] font-medium text-white"
               style={{ backgroundColor: "#4A7C3F" }}
             >
-              \u2713 Yasemin Tarifi
+              ✓ Yasemin Tarifi
             </div>
           </motion.div>
         </div>

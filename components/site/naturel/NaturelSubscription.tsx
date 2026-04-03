@@ -4,16 +4,16 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 
 const advantages = [
-  "Her ay kap\u0131n\u0131za taze \u00FCr\u00FCnler",
+  "Her ay kapınıza taze ürünler",
   "%15 abonelik indirimi",
-  "\u0130stedi\u011Finiz zaman iptal",
-  "\u00D6ncelikli kargo ve \u00F6zel \u00FCr\u00FCnler",
+  "İstediğiniz zaman iptal",
+  "Öncelikli kargo ve özel ürünler",
 ];
 
 const plans = [
-  { name: "K\u00FC\u00E7\u00FCk", price: 280, desc: "3 \u00FCr\u00FCn" },
-  { name: "Standart", price: 420, desc: "5 \u00FCr\u00FCn", popular: true },
-  { name: "B\u00FCy\u00FCk", price: 560, desc: "8 \u00FCr\u00FCn" },
+  { name: "Küçük", price: 280, desc: "3 ürün" },
+  { name: "Standart", price: 420, desc: "5 ürün", popular: true },
+  { name: "Büyük", price: 560, desc: "8 ürün" },
 ];
 
 export default function NaturelSubscription() {
@@ -55,10 +55,10 @@ export default function NaturelSubscription() {
               className="font-body text-[10px] font-medium uppercase tracking-[0.2em] mb-3"
               style={{ color: "#A8D5A2" }}
             >
-              ABONEL\u0130K
+              ABONELİK
             </p>
             <h2 className="font-heading text-[36px] md:text-[48px] font-semibold text-white leading-tight">
-              Her ay kap\u0131n\u0131za, taze bir Naturel kutu.
+              Her ay kapınıza, taze bir Naturel kutu.
             </h2>
             <div className="mt-8 space-y-4">
               {advantages.map((item) => (
@@ -82,7 +82,7 @@ export default function NaturelSubscription() {
             {/* Badge */}
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-heading text-2xl text-brown-deep font-semibold">
-                Kutu Se\u00E7in
+                Kutu Seçin
               </h3>
               <span
                 className="font-body text-[11px] font-bold px-3 py-1 rounded-full text-white"
@@ -129,7 +129,7 @@ export default function NaturelSubscription() {
                     </div>
                   </div>
                   <p className="font-heading text-lg font-bold text-brown-deep">
-                    {plan.price}\u20BA
+                    {plan.price}₺
                     <span className="font-body text-[11px] font-normal text-brown-deep/50">
                       /ay
                     </span>
@@ -156,25 +156,25 @@ export default function NaturelSubscription() {
                 style={{ backgroundColor: "#4A7C3F" }}
               >
                 {status === "loading"
-                  ? "G\u00F6nderiliyor..."
-                  : "Abonelik Ba\u015Flat"}
+                  ? "Gönderiliyor..."
+                  : "Abonelik Başlat"}
               </button>
             </form>
 
             <p className="font-body text-[11px] text-center mt-3">
               {status === "success" && (
                 <span className="text-[#4A7C3F]">
-                  \u2713 Talebiniz al\u0131nd\u0131! Sizinle ileti\u015Fime ge\u00E7ece\u011Fiz.
+                  ✓ Talebiniz alındı! Sizinle iletişime geçeceğiz.
                 </span>
               )}
               {status === "error" && (
                 <span className="text-[#C4622D]">
-                  Bir hata olu\u015Ftu, tekrar deneyin.
+                  Bir hata oluştu, tekrar deneyin.
                 </span>
               )}
               {status === "idle" && (
                 <span className="text-brown-deep/40">
-                  \u0130stedi\u011Finiz zaman iptal edebilirsiniz.
+                  İstediğiniz zaman iptal edebilirsiniz.
                 </span>
               )}
               {status === "loading" && (

@@ -2,27 +2,27 @@ import SectionHeader from "@/components/site/ui/SectionHeader";
 
 const marketIngredients = [
   "Yulaf ezmesi",
-  "Glikoz-fruktoz \u015Furubu",
-  "Hidrojene bitkisel ya\u011F",
+  "Glikoz-fruktoz şurubu",
+  "Hidrojene bitkisel yağ",
   "Soya lesitini (E322)",
   "Sodyum benzoat (E211)",
   "Potasyum sorbat (E202)",
-  "Yapay \u00E7ilek aromas\u0131",
+  "Yapay çilek aroması",
   "Mono ve digliserit (E471)",
   "Titanyum dioksit (E171)",
-  "Karboksimetil sel\u00FCloz (E466)",
+  "Karboksimetil selüloz (E466)",
   "BHT antioksidan (E321)",
   "Yapay renklendirici (E129)",
 ];
 
-const naturelIngredients = ["Yulaf", "bal", "f\u0131nd\u0131k", "tar\u00E7\u0131n."];
+const naturelIngredients = ["Yulaf", "bal", "fındık", "tarçın."];
 
 const redFlags = [
-  "Glikoz-fruktoz \u015Furubu",
-  "Hidrojene bitkisel ya\u011F",
+  "Glikoz-fruktoz şurubu",
+  "Hidrojene bitkisel yağ",
   "Sodyum benzoat (E211)",
   "Potasyum sorbat (E202)",
-  "Yapay \u00E7ilek aromas\u0131",
+  "Yapay çilek aroması",
   "Titanyum dioksit (E171)",
   "BHT antioksidan (E321)",
   "Yapay renklendirici (E129)",
@@ -33,18 +33,18 @@ export default function NaturelIngredients() {
     <section className="py-20 bg-cream">
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <SectionHeader
-          eyebrow="\u015EEFFAFLIK"
-          title="\u0130\u00E7indekiler Listesi K\u0131sa Olmal\u0131"
+          eyebrow="ŞEFFAFLIK"
+          title="İçindekiler Listesi Kısa Olmalı"
         />
 
         <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 lg:gap-10 items-start max-w-4xl mx-auto">
           {/* Market Product */}
           <div className="bg-gray-100 border border-gray-200 p-6 lg:p-8">
             <p className="font-body text-[11px] font-medium uppercase tracking-wider text-gray-400 mb-4">
-              Market \u00DCr\u00FCn\u00FC
+              Market Ürünü
             </p>
             <h3 className="font-heading text-lg text-brown-deep mb-4">
-              &ldquo;Do\u011Fal&rdquo; Granola
+              &ldquo;Doğal&rdquo; Granola
             </h3>
             <ul className="space-y-1.5">
               {marketIngredients.map((item) => {
@@ -64,7 +64,7 @@ export default function NaturelIngredients() {
               })}
             </ul>
             <p className="font-body text-[11px] text-gray-400 mt-4">
-              12 madde, \u00E7o\u011Fu tan\u0131nmaz.
+              12 madde, çoğu tanınmaz.
             </p>
           </div>
 
@@ -92,10 +92,10 @@ export default function NaturelIngredients() {
               className="font-body text-[11px] font-medium uppercase tracking-wider mb-4"
               style={{ color: "#4A7C3F" }}
             >
-              Naturel \u00DCr\u00FCn\u00FCm\u00FCz
+              Naturel Ürünümüz
             </p>
             <h3 className="font-heading text-lg text-brown-deep mb-4">
-              Ev Yap\u0131m\u0131 Granola
+              Ev Yapımı Granola
             </h3>
             <p className="font-body text-[15px] text-brown-deep font-medium leading-relaxed">
               {naturelIngredients.join(" ")}
@@ -104,15 +104,15 @@ export default function NaturelIngredients() {
               className="font-body text-[14px] font-semibold mt-4"
               style={{ color: "#4A7C3F" }}
             >
-              Hepsi bu kadar. \u2713
+              Hepsi bu kadar. ✓
             </p>
           </div>
         </div>
 
         {/* Bottom Quote */}
         <p className="font-heading text-xl md:text-2xl italic text-center text-brown-deep/70 mt-12 max-w-2xl mx-auto">
-          &ldquo;E\u011Fer bir \u00E7ocu\u011Fa i\u00E7indekiler listesini okuyam\u0131yorsan\u0131z,
-          o \u00FCr\u00FCn\u00FC yememeli.&rdquo;
+          &ldquo;Eğer bir çocuğa içindekiler listesini okuyamıyorsanız,
+          o ürünü yememeli.&rdquo;
         </p>
       </div>
     </section>

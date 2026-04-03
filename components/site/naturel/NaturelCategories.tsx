@@ -13,8 +13,8 @@ export default function NaturelCategories() {
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <SectionHeader
-          eyebrow="KATEGOR\u0130LER"
-          title="Her \u0130htiyaca Bir Lezzet"
+          eyebrow="KATEGORİLER"
+          title="Her İhtiyaca Bir Lezzet"
         />
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
@@ -47,7 +47,7 @@ export default function NaturelCategories() {
                     className="font-body text-[11px] font-medium mt-3 uppercase tracking-wider"
                     style={{ color: "#4A7C3F" }}
                   >
-                    {count} \u00FCr\u00FCn \u2192
+                    {count} ürün →
                   </p>
                 </Link>
               </motion.div>

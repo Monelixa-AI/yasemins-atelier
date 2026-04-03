@@ -6,21 +6,21 @@ import SectionHeader from "@/components/site/ui/SectionHeader";
 
 const reviews = [
   {
-    text: "K\u0131z\u0131m i\u00E7in ald\u0131\u011F\u0131m sebzeli krakerler harika. Renkli olmas\u0131 dikkatini \u00E7ekiyor, severek yiyor. \u0130\u00E7inde ne oldu\u011Funu bilmek \u00E7ok rahatlatici.",
+    text: "Kızım için aldığım sebzeli krakerler harika. Renkli olması dikkatini çekiyor, severek yiyor. İçinde ne olduğunu bilmek çok rahatlatici.",
     name: "Elif T.",
-    occasion: "\u00C7ocuk Serisi",
+    occasion: "Çocuk Serisi",
     initials: "ET",
     rating: 5,
   },
   {
-    text: "Granola ba\u011F\u0131ml\u0131s\u0131 oldum! Her sabah yo\u011Furdun \u00FCst\u00FCne koyuyorum. Markettekilerle kar\u015F\u0131la\u015Ft\u0131r\u0131nca ne kadar saf oldu\u011Fu hissediliyor.",
+    text: "Granola bağımlısı oldum! Her sabah yoğurdun üstüne koyuyorum. Markettekilerle karşılaştırınca ne kadar saf olduğu hissediliyor.",
     name: "Burak S.",
     occasion: "Granola & Bar",
     initials: "BS",
     rating: 5,
   },
   {
-    text: "Hediye kutusu olarak g\u00F6nderdim, alan ki\u015Fi \u00E7ok be\u011Fendi. Paketleme \u00E7ok \u015F\u0131k ve \u00FCr\u00FCnlerin tamam\u0131 ger\u00E7ekten lezzetli.",
+    text: "Hediye kutusu olarak gönderdim, alan kişi çok beğendi. Paketleme çok şık ve ürünlerin tamamı gerçekten lezzetli.",
     name: "Selin K.",
     occasion: "Hediye Kutusu",
     initials: "SK",
@@ -33,7 +33,7 @@ export default function NaturelTestimonials() {
     <section className="py-16 bg-cream">
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <SectionHeader
-          eyebrow="M\u00FC\u015Fteri Deneyimi"
+          eyebrow="Müşteri Deneyimi"
           title="Naturel Ailesi Ne Diyor?"
         />
 
