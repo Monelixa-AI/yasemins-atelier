@@ -1,0 +1,11 @@
+export { default as HeroSection } from "./HeroSection";
+export { default as TrustBar } from "./TrustBar";
+export { default as OccasionNav } from "./OccasionNav";
+export { default as FeaturedCollection } from "./FeaturedCollection";
+export { default as ChefIntro } from "./ChefIntro";
+export { default as OccasionEditorial } from "./OccasionEditorial";
+export { default as CustomerGallery } from "./CustomerGallery";
+export { default as Testimonials } from "./Testimonials";
+export { default as JournalPreview } from "./JournalPreview";
+export { default as NewsletterSection } from "./NewsletterSection";
+export { default as ServicesPreview } from "./ServicesPreview";
