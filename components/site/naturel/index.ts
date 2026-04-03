@@ -1,0 +1,11 @@
+export { default as NaturelHero } from "./NaturelHero";
+export { default as NaturelTrustBar } from "./NaturelTrustBar";
+export { default as NaturelManifesto } from "./NaturelManifesto";
+export { default as NaturelCategories } from "./NaturelCategories";
+export { default as NaturelFeatured } from "./NaturelFeatured";
+export { default as NaturelProductCard } from "./NaturelProductCard";
+export { default as NaturelChildrenSection } from "./NaturelChildrenSection";
+export { default as NaturelIngredients } from "./NaturelIngredients";
+export { default as NaturelSubscription } from "./NaturelSubscription";
+export { default as NaturelTestimonials } from "./NaturelTestimonials";
+export { default as NaturelCTA } from "./NaturelCTA";

@@ -9,3 +9,4 @@ export { default as Testimonials } from "./Testimonials";
 export { default as JournalPreview } from "./JournalPreview";
 export { default as NewsletterSection } from "./NewsletterSection";
 export { default as ServicesPreview } from "./ServicesPreview";
+export { default as NaturelSection } from "./NaturelSection";

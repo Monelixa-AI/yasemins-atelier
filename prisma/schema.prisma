@@ -249,6 +249,12 @@ model Product {
   sortOrder           Int                 @default(0)
   avgRating           Decimal?            @db.Decimal(3, 2)
   reviewCount         Int                 @default(0)
+  isNaturel           Boolean             @default(false)
+  stockCount          Int?
+  lowStockAlert       Int?
+  shippingClass       String?
+  isShippable         Boolean             @default(false)
+  stockMovements      StockMovement[]
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
 }
@@ -720,6 +726,19 @@ model BookingTimeline {
   note      String?
   createdBy String?
   createdAt DateTime       @default(now())
+}
+
+// ─── STOCK MANAGEMENT ──────────────────────────────────
+
+model StockMovement {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  type      String   // "IN", "OUT", "ADJUSTMENT"
+  quantity  Int
+  note      String?
+  createdBy String?
+  createdAt DateTime @default(now())
 }
 
 model AvailabilityRule {

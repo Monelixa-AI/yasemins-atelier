@@ -6,7 +6,10 @@
       "Bash(npx prisma:*)",
       "Bash(npm install:*)",
       "Bash(npx next:*)",
-      "Bash(node -e \"const l = require\\('lucide-react'\\); console.log\\('Instagram:', !!l.Instagram\\); console.log\\('Youtube:', !!l.Youtube\\); const names = Object.keys\\(l\\).filter\\(k => k.toLowerCase\\(\\).includes\\('instagram'\\) || k.toLowerCase\\(\\).includes\\('youtube'\\)\\); console.log\\(names\\);\")"
+      "Bash(node -e \"const l = require\\('lucide-react'\\); console.log\\('Instagram:', !!l.Instagram\\); console.log\\('Youtube:', !!l.Youtube\\); const names = Object.keys\\(l\\).filter\\(k => k.toLowerCase\\(\\).includes\\('instagram'\\) || k.toLowerCase\\(\\).includes\\('youtube'\\)\\); console.log\\(names\\);\")",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //F //PID 60260)"
     ]
   }
 }

@@ -4,6 +4,7 @@ import {
   ServicesPreview,
   OccasionNav,
   FeaturedCollection,
+  NaturelSection,
   ChefIntro,
   OccasionEditorial,
   CustomerGallery,
@@ -20,6 +21,7 @@ export default function HomePage() {
       <ServicesPreview />
       <OccasionNav />
       <FeaturedCollection />
+      <NaturelSection />
       <ChefIntro />
       <OccasionEditorial />
       <CustomerGallery />

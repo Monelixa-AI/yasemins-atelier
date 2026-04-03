@@ -11,6 +11,7 @@ const navLinks = [
   { href: "/hizmetler", label: "Hizmetler" },
   { href: "/occasions", label: "Özel Günler" },
   { href: "/menu", label: "Menü" },
+  { href: "/naturel", label: "🌿 Naturel", isGreen: true },
   { href: "/atelier", label: "Atelier" },
   { href: "/journal", label: "Journal" },
 ];
@@ -65,7 +66,11 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="font-body text-[15px] text-brown-deep hover:text-terracotta transition-colors duration-200"
+                className={`font-body text-[15px] transition-colors duration-200 ${
+                  "isGreen" in link && link.isGreen
+                    ? "text-[#4A7C3F] hover:text-[#2D4A1E] font-medium"
+                    : "text-brown-deep hover:text-terracotta"
+                }`}
               >
                 {link.label}
               </Link>
