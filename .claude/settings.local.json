@@ -43,7 +43,14 @@
       "Bash(mkdir -p \"app/api/reviews/[id]/helpful\")",
       "Bash(mkdir -p \"app/api/reviews/[id]/photos\")",
       "Bash(echo \"EXIT: $?\")",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(mkdir -p \"app/\\(site\\)/kurumsal/hesap/toplu-siparis/[id]\")",
+      "Bash(mkdir -p \"app/api/corporate/[id]/approve\")",
+      "Bash(mkdir -p \"app/api/corporate/[id]/reject\")",
+      "Bash(mkdir -p \"app/api/corporate/orders/[orderId]/approve\")",
+      "Bash(mkdir -p \"app/api/corporate/orders/[orderId]/reject\")",
+      "Bash(ls -la \"C:\\\\Users\\\\Sonat\\\\Documents\\\\VS-CODE-PROJECTS\\\\YASE_ATELIER\\\\YASE_ATELIER_VS\\\\yasemins-atelier\\\\emails\\\\Corporate\"*.tsx)"
     ]
   }
 }

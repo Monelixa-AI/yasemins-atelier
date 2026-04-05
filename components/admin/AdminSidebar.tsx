@@ -62,6 +62,12 @@ const NAV_GROUPS = [
     ],
   },
   {
+    label: "KURUMSAL",
+    items: [
+      { href: "/admin/kurumsal", icon: Users, label: "B2B Yönetimi" },
+    ],
+  },
+  {
     label: "SİSTEM",
     items: [
       { href: "/admin/musaitlik", icon: Calendar, label: "Müsaitlik" },

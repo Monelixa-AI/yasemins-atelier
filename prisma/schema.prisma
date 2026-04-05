@@ -168,6 +168,8 @@ model User {
   referralsMade     Referral[]         @relation("ReferralsMade")
   referralReceived  Referral?          @relation("ReferralReceived")
   notificationPrefs NotificationPreference?
+  corporateAccount  CorporateAccount?
+  corporateMemberships CorporateMember[]
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
 }
@@ -423,6 +425,11 @@ model Order {
   timeline        OrderTimeline[]
   payments        Payment[]
   invoice         Invoice?
+  corporateAccountId String?
+  corporateAccount   CorporateAccount? @relation("CorporateOrders", fields: [corporateAccountId], references: [id])
+  approvalRequest    OrderApproval?
+  bulkOrderId        String?
+  bulkOrder          BulkOrder?        @relation("BulkOrders", fields: [bulkOrderId], references: [id])
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 }
@@ -1142,4 +1149,160 @@ model SurveyResponse {
   answers   Json
   npsScore  Int?
   createdAt DateTime @default(now())
+}
+
+// ─── B2B / CORPORATE ───────────────────────────────────
+
+enum CorporateStatus {
+  PENDING
+  REVIEWING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum CorporateRole {
+  OWNER
+  ADMIN
+  APPROVER
+  MEMBER
+  VIEWER
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum BulkOrderStatus {
+  PROCESSING
+  PARTIAL
+  COMPLETED
+  FAILED
+}
+
+model CorporateAccount {
+  id               String              @id @default(cuid())
+  userId           String              @unique
+  user             User                @relation(fields: [userId], references: [id])
+  companyName      String
+  taxNumber        String?
+  taxOffice        String?
+  invoiceEmail     String?
+  invoiceAddress   String?
+  contactName      String
+  contactPhone     String
+  contactEmail     String
+  status           CorporateStatus     @default(PENDING)
+  approvedAt       DateTime?
+  approvedBy       String?
+  rejectedReason   String?
+  priceGroupId     String?
+  priceGroup       CorporatePriceGroup? @relation(fields: [priceGroupId], references: [id])
+  paymentTermDays  Int                 @default(0)
+  creditLimit      Decimal?            @db.Decimal(10, 2)
+  currentBalance   Decimal             @default(0) @db.Decimal(10, 2)
+  requiresApproval Boolean             @default(false)
+  maxOrderAmount   Decimal?            @db.Decimal(10, 2)
+  members          CorporateMember[]
+  orders           Order[]             @relation("CorporateOrders")
+  templates        OrderTemplate[]
+  invoices         CorporateInvoice[]
+  bulkOrders       BulkOrder[]
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+}
+
+model CorporateMember {
+  id             String           @id @default(cuid())
+  corporateId    String
+  corporate      CorporateAccount @relation(fields: [corporateId], references: [id])
+  userId         String
+  user           User             @relation(fields: [userId], references: [id])
+  role           CorporateRole    @default(MEMBER)
+  canOrder       Boolean          @default(true)
+  canApprove     Boolean          @default(false)
+  maxOrderAmount Decimal?         @db.Decimal(10, 2)
+  isActive       Boolean          @default(true)
+  invitedAt      DateTime         @default(now())
+  joinedAt       DateTime?
+}
+
+model CorporatePriceGroup {
+  id            String             @id @default(cuid())
+  name          String
+  description   String?
+  discountType  DiscountType
+  discountValue Decimal            @db.Decimal(5, 2)
+  categoryRules Json               @default("[]")
+  accounts      CorporateAccount[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+}
+
+model OrderTemplate {
+  id             String           @id @default(cuid())
+  corporateId    String
+  corporate      CorporateAccount @relation(fields: [corporateId], references: [id])
+  name           String
+  description    String?
+  items          Json
+  deliveryAddress Json?
+  notes          String?
+  usageCount     Int              @default(0)
+  lastUsedAt     DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model OrderApproval {
+  id               String         @id @default(cuid())
+  orderId          String         @unique
+  order            Order          @relation(fields: [orderId], references: [id])
+  requestedBy      String
+  approvedBy       String?
+  status           ApprovalStatus @default(PENDING)
+  requestedAt      DateTime       @default(now())
+  respondedAt      DateTime?
+  note             String?
+  notificationSent Boolean        @default(false)
+}
+
+model CorporateInvoice {
+  id           String           @id @default(cuid())
+  corporateId  String
+  corporate    CorporateAccount @relation(fields: [corporateId], references: [id])
+  invoiceNo    String           @unique
+  period       String
+  orders       Json
+  subtotal     Decimal          @db.Decimal(10, 2)
+  taxAmount    Decimal          @db.Decimal(10, 2)
+  total        Decimal          @db.Decimal(10, 2)
+  pdfUrl       String?
+  status       InvoiceStatus    @default(DRAFT)
+  dueDate      DateTime?
+  paidAt       DateTime?
+  createdAt    DateTime         @default(now())
+}
+
+model BulkOrder {
+  id           String           @id @default(cuid())
+  corporateId  String
+  corporate    CorporateAccount @relation(fields: [corporateId], references: [id])
+  name         String
+  status       BulkOrderStatus  @default(PROCESSING)
+  csvData      Json
+  orders       Order[]          @relation("BulkOrders")
+  totalAmount  Decimal          @db.Decimal(10, 2)
+  errorLog     Json?
+  createdAt    DateTime         @default(now())
 }
