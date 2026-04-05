@@ -1,31 +1,17 @@
 import type { Metadata } from "next";
-import { Header, Footer, WhatsAppButton, CookieBanner } from "@/components/site/layout";
+import { Header, Footer, WhatsAppButton, CookieConsent, AnalyticsProvider } from "@/components/site/layout";
 import CartDrawer from "@/components/site/cart/CartDrawer";
 import ChatWidget from "@/components/site/chat/ChatWidget";
+import PopupManager from "@/components/site/popups/PopupManager";
+import SiteBanner from "@/components/site/layout/SiteBanner";
+import UTMTracker from "@/components/site/UTMTracker";
+import FlashSaleBar from "@/components/site/flash/FlashSaleBar";
+import TikTokPixel from "@/components/site/TikTokPixel";
+import { JsonLd } from "@/components/site/JsonLd";
+import { getOrganizationSchema, getLocalBusinessSchema } from "@/lib/structured-data";
+import { defaultMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
-  title: {
-    default: "Yasemin's Atelier | Gastronomi Şefi · İstanbul",
-    template: "%s | Yasemin's Atelier",
-  },
-  description:
-    "İstanbul'da el yapımı, taze hazırlanmış mezeler, börekler ve özel siparişler. Gastronomi şefi Yasemin'in atölyesinden sofralarınıza.",
-  keywords: [
-    "yasemin atelier",
-    "istanbul catering",
-    "el yapımı meze",
-    "istanbul yemek siparişi",
-    "özel sofra",
-    "gastronomi",
-  ],
-  openGraph: {
-    title: "Yasemin's Atelier",
-    description: "Her sofra, bir sanat eseridir.",
-    images: ["/images/hero-chef.png"],
-    locale: "tr_TR",
-    type: "website",
-  },
-};
+export const metadata: Metadata = defaultMetadata;
 
 export default function SiteLayout({
   children,
@@ -34,13 +20,21 @@ export default function SiteLayout({
 }) {
   return (
     <>
+      <JsonLd data={getOrganizationSchema()} />
+      <JsonLd data={getLocalBusinessSchema()} />
       <Header />
+      <SiteBanner />
+      <FlashSaleBar />
       <main className="pt-[90px]">{children}</main>
       <Footer />
       <CartDrawer />
       <ChatWidget />
       <WhatsAppButton />
-      <CookieBanner />
+      <AnalyticsProvider />
+      <TikTokPixel />
+      <CookieConsent />
+      <PopupManager />
+      <UTMTracker />
     </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -16,6 +16,8 @@ import {
 import confetti from "canvas-confetti";
 import { useCartStore } from "@/store/cart";
 import OrderSummary from "./OrderSummary";
+import { StripePaymentForm } from "./StripePaymentForm";
+import { IyzicoPaymentForm } from "./IyzicoPaymentForm";
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */
@@ -33,6 +35,8 @@ interface DeliveryForm {
   giftNote: string;
 }
 
+type PaymentMethodType = "stripe" | "iyzico" | "cash" | "pos";
+
 const ISTANBUL_DISTRICTS = [
   "Kadikoy", "Besiktas", "Sisli", "Uskudar", "Fatih", "Beyoglu",
   "Atasehir", "Maltepe", "Bakirkoy", "Sariyer", "Beykoz", "Kartal",
@@ -49,9 +53,11 @@ const TIME_SLOTS = [
 
 const STEP_CONFIG = [
   { num: 1, label: "Teslimat", icon: Truck },
-  { num: 2, label: "Odeme", icon: CreditCard },
+  { num: 2, label: "Ödeme", icon: CreditCard },
   { num: 3, label: "Onay", icon: Check },
 ];
+
+const CASH_FEE = 10;
 
 /* ------------------------------------------------------------------ */
 /* Component                                                           */
@@ -73,15 +79,20 @@ export default function CheckoutPage() {
     isGift: false,
     giftNote: "",
   });
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash" | "pos">("card");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>("stripe");
   const [discountCode, setDiscountCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
   const [discountMsg, setDiscountMsg] = useState("");
   const [discountLoading, setDiscountLoading] = useState(false);
 
-  const [orderLoading, setOrderLoading] = useState(false);
+  const [orderId, setOrderId] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
+  const [orderLoading, setOrderLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [paymentError, setPaymentError] = useState("");
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -92,7 +103,9 @@ export default function CheckoutPage() {
 
   const subtotal = mounted ? getSubtotal() : 0;
   const deliveryFee = subtotal >= 500 ? 0 : 50;
-  const total = subtotal + deliveryFee - discountAmount;
+  const isCash = paymentMethod === "cash" || paymentMethod === "pos";
+  const cashFee = isCash ? CASH_FEE : 0;
+  const total = subtotal + deliveryFee - discountAmount + cashFee;
 
   /* ---------- validate discount ---------- */
   const applyDiscount = async () => {
@@ -114,15 +127,14 @@ export default function CheckoutPage() {
         setDiscountMsg(data.message);
       }
     } catch {
-      setDiscountMsg("Bir hata olustu.");
+      setDiscountMsg("Bir hata oluştu.");
     } finally {
       setDiscountLoading(false);
     }
   };
 
-  /* ---------- place order ---------- */
-  const placeOrder = async () => {
-    setOrderLoading(true);
+  /* ---------- create order ---------- */
+  const createOrder = async (): Promise<{ orderId: string; orderNumber: string } | null> => {
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
@@ -140,32 +152,124 @@ export default function CheckoutPage() {
           subtotal,
           deliveryFee,
           discount: discountAmount,
-          total,
+          total: subtotal + deliveryFee - discountAmount,
         }),
       });
       const data = await res.json();
       if (res.ok) {
+        setOrderId(data.orderId);
         setOrderNumber(data.orderNumber ?? data.orderId);
+        return { orderId: data.orderId, orderNumber: data.orderNumber };
+      }
+      setPaymentError(data.error || "Sipariş oluşturulamadı.");
+      return null;
+    } catch {
+      setPaymentError("Bağlantı hatası, lütfen tekrar deneyin.");
+      return null;
+    }
+  };
+
+  /* ---------- initiate Stripe payment ---------- */
+  const initiateStripePayment = async () => {
+    setPaymentLoading(true);
+    setPaymentError("");
+
+    const order = await createOrder();
+    if (!order) {
+      setPaymentLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/payments/create-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: order.orderId }),
+      });
+      const data = await res.json();
+      if (res.ok && data.clientSecret) {
+        setClientSecret(data.clientSecret);
+      } else {
+        setPaymentError(data.error || "Ödeme başlatılamadı.");
+      }
+    } catch {
+      setPaymentError("Ödeme bağlantısı kurulamadı.");
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
+  /* ---------- handle payment method change ---------- */
+  const handlePaymentMethodChange = (method: PaymentMethodType) => {
+    setPaymentMethod(method);
+    setClientSecret(null);
+    setPaymentError("");
+  };
+
+  /* ---------- Stripe success ---------- */
+  const handleStripeSuccess = useCallback(() => {
+    setOrderSuccess(true);
+    clearCart();
+    confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
+    setStep(3);
+  }, [clearCart]);
+
+  /* ---------- handle cash/pos payment ---------- */
+  const handleCashPayment = async () => {
+    setOrderLoading(true);
+    setPaymentError("");
+
+    const order = await createOrder();
+    if (!order) {
+      setOrderLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/orders/cash", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: order.orderId,
+          method: paymentMethod === "pos" ? "POS_ON_DELIVERY" : "CASH",
+        }),
+      });
+
+      if (res.ok) {
         setOrderSuccess(true);
         clearCart();
         confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
+        setStep(3);
       } else {
-        alert(data.error || "Siparis olusturulamadi.");
+        const data = await res.json();
+        setPaymentError(data.error || "Sipariş onaylanamadı.");
       }
     } catch {
-      alert("Baglanti hatasi, lutfen tekrar deneyin.");
+      setPaymentError("Bağlantı hatası.");
     } finally {
       setOrderLoading(false);
     }
   };
 
-  /* ---------- step 3 auto-submit on mount ---------- */
-  useEffect(() => {
-    if (step === 3 && !orderSuccess && !orderLoading) {
-      placeOrder();
+  /* ---------- iyzico error callback ---------- */
+  const handleIyzicoError = useCallback((msg: string) => {
+    setPaymentError(msg);
+  }, []);
+
+  /* ---------- initiate iyzico payment ---------- */
+  const initiateIyzicoPayment = async () => {
+    setPaymentLoading(true);
+    setPaymentError("");
+
+    const order = await createOrder();
+    if (!order) {
+      setPaymentLoading(false);
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step]);
+
+    setPaymentLoading(false);
+    // IyzicoPaymentForm handles the rest via orderId
+  };
 
   /* ---------- step validation ---------- */
   const canProceed = () => {
@@ -190,15 +294,15 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center px-6">
         <ShoppingBag size={56} className="text-gold-light mb-4" />
-        <h2 className="font-heading text-2xl text-brown-deep">Sepetiniz Bos</h2>
+        <h2 className="font-heading text-2xl text-brown-deep">Sepetiniz Boş</h2>
         <p className="font-body text-sm text-brown-mid mt-2">
-          Lezzetli urunlerimizi kesfetmek ister misiniz?
+          Lezzetli ürünlerimizi keşfetmek ister misiniz?
         </p>
         <Link
           href="/menu"
           className="mt-6 bg-terracotta text-white font-body text-sm font-medium px-8 py-3 hover:bg-terracotta-dark transition-colors"
         >
-          Menuyu Kesfet
+          Menüyü Keşfet
         </Link>
       </div>
     );
@@ -274,7 +378,7 @@ export default function CheckoutPage() {
                       value={delivery.name}
                       onChange={(e) => setDelivery({ ...delivery, name: e.target.value })}
                       className="w-full border border-gold-light px-3 py-2.5 font-body text-sm text-brown-deep focus:outline-none focus:border-terracotta"
-                      placeholder="Adiniz Soyadiniz"
+                      placeholder="Adınız Soyadınız"
                     />
                   </div>
                   <div>
@@ -303,14 +407,14 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <label className="font-body text-xs font-medium text-brown-deep block mb-1">
-                      Ilce *
+                      İlçe *
                     </label>
                     <select
                       value={delivery.district}
                       onChange={(e) => setDelivery({ ...delivery, district: e.target.value })}
                       className="w-full border border-gold-light px-3 py-2.5 font-body text-sm text-brown-deep focus:outline-none focus:border-terracotta bg-white"
                     >
-                      <option value="">Ilce secin</option>
+                      <option value="">İlçe seçin</option>
                       {ISTANBUL_DISTRICTS.map((d) => (
                         <option key={d} value={d}>
                           {d}
@@ -385,7 +489,7 @@ export default function CheckoutPage() {
                     />
                     <Gift size={16} className="text-gold" />
                     <span className="font-body text-sm text-brown-deep">
-                      Hediye olarak gonderilsin
+                      Hediye olarak gönderilsin
                     </span>
                   </label>
                   {delivery.isGift && (
@@ -406,7 +510,7 @@ export default function CheckoutPage() {
                   disabled={!canProceed()}
                   className="w-full bg-terracotta text-white font-body text-sm font-medium py-4 hover:bg-terracotta-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  Odemeye Gec
+                  Ödemeye Geç
                 </button>
               </motion.div>
             )}
@@ -420,95 +524,101 @@ export default function CheckoutPage() {
                 exit={{ opacity: 0, x: -30 }}
                 className="space-y-5"
               >
-                <h2 className="font-heading text-2xl text-brown-deep">Odeme</h2>
+                <h2 className="font-heading text-2xl text-brown-deep">Ödeme Yöntemi</h2>
 
-                {/* Payment method tabs */}
-                <div className="flex border border-gold-light overflow-hidden">
-                  {(
-                    [
-                      { key: "card" as const, label: "Kredi Karti" },
-                      { key: "cash" as const, label: "Nakit" },
-                      { key: "pos" as const, label: "POS" },
-                    ] as const
-                  ).map((pm) => (
-                    <button
+                {/* Payment method selection */}
+                <div className="space-y-3">
+                  {([
+                    {
+                      key: "stripe" as const,
+                      label: "Kredi / Banka Kartı (Uluslararası)",
+                      desc: "Visa, Mastercard, Amex — Stripe güvenli ödeme",
+                    },
+                    {
+                      key: "iyzico" as const,
+                      label: "Yerli Kart / Taksit (Türkiye)",
+                      desc: "Troy dahil — iyzico ile taksit imkanı",
+                    },
+                    {
+                      key: "cash" as const,
+                      label: "Kapıda Nakit Ödeme",
+                      desc: `Teslimat sırasında nakit — +${CASH_FEE}₺ ek ücret`,
+                    },
+                    {
+                      key: "pos" as const,
+                      label: "Kapıda POS ile Ödeme",
+                      desc: `Kurye ile kredi kartı — +${CASH_FEE}₺ ek ücret`,
+                    },
+                  ]).map((pm) => (
+                    <label
                       key={pm.key}
-                      onClick={() => setPaymentMethod(pm.key)}
-                      className={`flex-1 py-3 font-body text-sm font-medium transition-colors ${
+                      className={`flex items-start gap-3 p-4 border-2 cursor-pointer transition-all ${
                         paymentMethod === pm.key
-                          ? "bg-terracotta text-white"
-                          : "text-brown-mid hover:bg-cream"
+                          ? "border-terracotta bg-terracotta-light/10"
+                          : "border-gold-light/60 hover:border-gold"
                       }`}
                     >
-                      {pm.label}
-                    </button>
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value={pm.key}
+                        checked={paymentMethod === pm.key}
+                        onChange={() => handlePaymentMethodChange(pm.key)}
+                        className="accent-terracotta mt-1"
+                      />
+                      <div>
+                        <span className="font-body text-sm font-medium text-brown-deep">
+                          {pm.label}
+                        </span>
+                        <p className="font-body text-xs text-brown-mid mt-0.5">{pm.desc}</p>
+                      </div>
+                    </label>
                   ))}
                 </div>
 
-                {/* Card form (mock) */}
-                {paymentMethod === "card" && (
-                  <div className="space-y-3 border border-gold-light/50 p-4">
-                    <div>
-                      <label className="font-body text-xs font-medium text-brown-deep block mb-1">
-                        Kart Numarasi
-                      </label>
-                      <input
-                        className="w-full border border-gold-light px-3 py-2.5 font-body text-sm text-brown-deep focus:outline-none focus:border-terracotta"
-                        placeholder="XXXX XXXX XXXX XXXX"
-                        maxLength={19}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="font-body text-xs font-medium text-brown-deep block mb-1">
-                          Son Kullanma
-                        </label>
-                        <input
-                          className="w-full border border-gold-light px-3 py-2.5 font-body text-sm text-brown-deep focus:outline-none focus:border-terracotta"
-                          placeholder="AA/YY"
-                          maxLength={5}
-                        />
-                      </div>
-                      <div>
-                        <label className="font-body text-xs font-medium text-brown-deep block mb-1">
-                          CVV
-                        </label>
-                        <input
-                          className="w-full border border-gold-light px-3 py-2.5 font-body text-sm text-brown-deep focus:outline-none focus:border-terracotta"
-                          placeholder="XXX"
-                          maxLength={4}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="font-body text-xs font-medium text-brown-deep block mb-1">
-                        Kart Uzerindeki Isim
-                      </label>
-                      <input
-                        className="w-full border border-gold-light px-3 py-2.5 font-body text-sm text-brown-deep focus:outline-none focus:border-terracotta"
-                        placeholder="AD SOYAD"
-                      />
-                    </div>
+                {/* Payment error */}
+                {paymentError && (
+                  <div className="bg-red-50 border border-red-200 p-3 rounded-lg">
+                    <p className="font-body text-sm text-red-600">{paymentError}</p>
                   </div>
                 )}
 
-                {paymentMethod === "cash" && (
-                  <div className="bg-cream p-4 font-body text-sm text-brown-mid">
-                    Teslimat sirasinda nakit odeme yapabilirsiniz. Lutfen uygun banknot hazir
-                    bulundurun.
-                  </div>
+                {/* Stripe payment form */}
+                {paymentMethod === "stripe" && clientSecret && (
+                  <StripePaymentForm
+                    clientSecret={clientSecret}
+                    orderId={orderId}
+                    onSuccess={handleStripeSuccess}
+                    onError={(msg) => setPaymentError(msg)}
+                  />
                 )}
 
-                {paymentMethod === "pos" && (
-                  <div className="bg-cream p-4 font-body text-sm text-brown-mid">
-                    Teslimat sirasinda mobil POS cihazi ile kart odeme yapabilirsiniz.
+                {/* iyzico payment form */}
+                {paymentMethod === "iyzico" && orderId && (
+                  <IyzicoPaymentForm
+                    orderId={orderId}
+                    onError={handleIyzicoError}
+                  />
+                )}
+
+                {/* Cash/POS info */}
+                {(paymentMethod === "cash" || paymentMethod === "pos") && (
+                  <div className="bg-[#FDF6EE] p-4 rounded-lg font-body text-sm text-brown-mid space-y-2">
+                    <p>
+                      {paymentMethod === "cash"
+                        ? "Teslimat sırasında nakit ödeme yapabilirsiniz. Lütfen uygun banknot hazır bulundurun."
+                        : "Teslimat sırasında kurye mobil POS cihazı ile kartınızdan ödeme alacaktır."}
+                    </p>
+                    <p className="text-xs text-terracotta font-medium">
+                      +{CASH_FEE}₺ kapıda ödeme ek ücreti uygulanır.
+                    </p>
                   </div>
                 )}
 
                 {/* Discount code */}
                 <div className="border border-gold-light/50 p-4">
                   <label className="font-body text-xs font-medium text-brown-deep block mb-2">
-                    Indirim Kodu
+                    İndirim Kodu
                   </label>
                   <div className="flex gap-2">
                     <input
@@ -549,12 +659,18 @@ export default function CheckoutPage() {
                   <div className="flex justify-between text-brown-mid">
                     <span>Teslimat</span>
                     <span>
-                      {deliveryFee === 0 ? "Ucretsiz" : `${deliveryFee}\u20BA`}
+                      {deliveryFee === 0 ? "Ücretsiz" : `${deliveryFee}\u20BA`}
                     </span>
                   </div>
+                  {cashFee > 0 && (
+                    <div className="flex justify-between text-brown-mid">
+                      <span>Kapıda Ödeme Ücreti</span>
+                      <span>+{cashFee}&#x20BA;</span>
+                    </div>
+                  )}
                   {discountAmount > 0 && (
                     <div className="flex justify-between text-green-600">
-                      <span>Indirim</span>
+                      <span>İndirim</span>
                       <span>-{discountAmount}&#x20BA;</span>
                     </div>
                   )}
@@ -574,12 +690,60 @@ export default function CheckoutPage() {
                   >
                     Geri
                   </button>
-                  <button
-                    onClick={() => setStep(3)}
-                    className="flex-[2] bg-terracotta text-white font-body text-sm font-medium py-4 hover:bg-terracotta-dark transition-colors"
-                  >
-                    Siparisi Onayla
-                  </button>
+
+                  {/* Stripe: create intent then show form */}
+                  {paymentMethod === "stripe" && !clientSecret && (
+                    <button
+                      onClick={initiateStripePayment}
+                      disabled={paymentLoading}
+                      className="flex-[2] bg-terracotta text-white font-body text-sm font-medium py-4 hover:bg-terracotta-dark transition-colors disabled:opacity-50"
+                    >
+                      {paymentLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <Loader2 size={16} className="animate-spin" />
+                          Hazırlanıyor...
+                        </span>
+                      ) : (
+                        "Kart ile Öde"
+                      )}
+                    </button>
+                  )}
+
+                  {/* iyzico: create order then show form */}
+                  {paymentMethod === "iyzico" && !orderId && (
+                    <button
+                      onClick={initiateIyzicoPayment}
+                      disabled={paymentLoading}
+                      className="flex-[2] bg-terracotta text-white font-body text-sm font-medium py-4 hover:bg-terracotta-dark transition-colors disabled:opacity-50"
+                    >
+                      {paymentLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <Loader2 size={16} className="animate-spin" />
+                          Hazırlanıyor...
+                        </span>
+                      ) : (
+                        "iyzico ile Öde"
+                      )}
+                    </button>
+                  )}
+
+                  {/* Cash/POS: direct order */}
+                  {(paymentMethod === "cash" || paymentMethod === "pos") && (
+                    <button
+                      onClick={handleCashPayment}
+                      disabled={orderLoading}
+                      className="flex-[2] bg-terracotta text-white font-body text-sm font-medium py-4 hover:bg-terracotta-dark transition-colors disabled:opacity-50"
+                    >
+                      {orderLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <Loader2 size={16} className="animate-spin" />
+                          İşleniyor...
+                        </span>
+                      ) : (
+                        "Siparişi Onayla"
+                      )}
+                    </button>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -592,31 +756,21 @@ export default function CheckoutPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center py-10 space-y-5"
               >
-                {orderLoading && !orderSuccess ? (
-                  <div className="py-12">
-                    <Loader2
-                      size={40}
-                      className="animate-spin text-terracotta mx-auto"
-                    />
-                    <p className="font-body text-sm text-brown-mid mt-4">
-                      Siparisizin isleniyor...
-                    </p>
-                  </div>
-                ) : orderSuccess ? (
+                {orderSuccess ? (
                   <>
                     <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
                       <PartyPopper size={40} className="text-green-600" />
                     </div>
                     <h2 className="font-heading text-3xl text-brown-deep">
-                      Siparisizin Alindi!
+                      Siparişiniz Alındı!
                     </h2>
                     <p className="font-body text-sm text-brown-mid max-w-md mx-auto">
-                      Siparisizin basariyla olusturuldu. Onay e-postasi en kisa surede
-                      gonderilecektir.
+                      Siparişiniz başarıyla oluşturuldu. Onay e-postası en kısa sürede
+                      gönderilecektir.
                     </p>
                     {orderNumber && (
                       <div className="bg-cream inline-block px-8 py-4">
-                        <p className="font-body text-xs text-brown-mid">Siparis No</p>
+                        <p className="font-body text-xs text-brown-mid">Sipariş No</p>
                         <p className="font-heading text-3xl text-terracotta font-bold">
                           {orderNumber}
                         </p>
@@ -626,39 +780,41 @@ export default function CheckoutPage() {
                     <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
                       <a
                         href={`https://wa.me/?text=${encodeURIComponent(
-                          `Yasemin's Atelier siparisim: ${orderNumber}`
+                          `Yasemin's Atelier siparişim: ${orderNumber}`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center justify-center gap-2 bg-green-600 text-white font-body text-sm px-6 py-3 hover:bg-green-700 transition-colors"
                       >
                         <MessageCircle size={16} />
-                        WhatsApp ile Paylas
+                        WhatsApp ile Paylaş
                       </a>
-                      <Link
-                        href="/hesabim/siparisler"
-                        className="inline-flex items-center justify-center gap-2 border-2 border-brown-deep text-brown-deep font-body text-sm px-6 py-3 hover:bg-brown-deep hover:text-white transition-colors"
-                      >
-                        Siparis Takibi
-                      </Link>
+                      {orderId && (
+                        <a
+                          href={`/api/invoices/${orderId}`}
+                          className="inline-flex items-center justify-center gap-2 border-2 border-terracotta text-terracotta font-body text-sm px-6 py-3 hover:bg-terracotta hover:text-white transition-colors"
+                        >
+                          Fatura İndir
+                        </a>
+                      )}
                       <Link
                         href="/menu"
                         className="inline-flex items-center justify-center gap-2 border-2 border-gold text-brown-mid font-body text-sm px-6 py-3 hover:bg-cream transition-colors"
                       >
-                        Alisverise Devam
+                        Alışverişe Devam
                       </Link>
                     </div>
                   </>
                 ) : (
                   <div className="py-12">
                     <p className="font-body text-sm text-red-500">
-                      Bir hata olustu. Lutfen tekrar deneyin.
+                      Bir hata oluştu. Lütfen tekrar deneyin.
                     </p>
                     <button
                       onClick={() => setStep(2)}
                       className="mt-4 bg-terracotta text-white font-body text-sm px-6 py-3 hover:bg-terracotta-dark transition-colors"
                     >
-                      Geri Don
+                      Geri Dön
                     </button>
                   </div>
                 )}

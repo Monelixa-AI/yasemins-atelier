@@ -99,6 +99,20 @@ enum OccasionSlug {
   MEVSIMSEL
 }
 
+enum PaymentProvider {
+  STRIPE
+  IYZICO
+  CASH
+  POS_ON_DELIVERY
+}
+
+enum PaymentMethodType {
+  CREDIT_CARD
+  DEBIT_CARD
+  CASH
+  POS_ON_DELIVERY
+}
+
 // ─── MODELS ─────────────────────────────────────────────
 
 model AdminUser {
@@ -151,6 +165,9 @@ model User {
   tags            CustomerTag[]        @relation("TagUsers")
   aiConversations AIConversation[]
   bookings        ServiceBooking[]
+  referralsMade     Referral[]         @relation("ReferralsMade")
+  referralReceived  Referral?          @relation("ReferralReceived")
+  notificationPrefs NotificationPreference?
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
 }
@@ -255,6 +272,7 @@ model Product {
   shippingClass       String?
   isShippable         Boolean             @default(false)
   stockMovements      StockMovement[]
+  flashSaleProducts   FlashSaleProduct[]
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
 }
@@ -403,6 +421,8 @@ model Order {
   adminNote       String?
   items           OrderItem[]
   timeline        OrderTimeline[]
+  payments        Payment[]
+  invoice         Invoice?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 }
@@ -489,6 +509,7 @@ model DiscountCode {
   validUntil       DateTime?
   isActive         Boolean      @default(true)
   orders           Order[]
+  affiliate        Affiliate?
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
 }
@@ -714,6 +735,8 @@ model ServiceBooking {
   cancelReason    String?
   reminderSent    Boolean          @default(false)
   timeline        BookingTimeline[]
+  payments        Payment[]
+  invoice         Invoice?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 }
@@ -763,4 +786,360 @@ model BlockedDate {
   startTime   String?
   endTime     String?
   createdAt   DateTime @default(now())
+}
+
+// ─── PAYMENT SYSTEM ────────────────────────────────────
+
+model Payment {
+  id                String            @id @default(cuid())
+  orderId           String?
+  order             Order?            @relation(fields: [orderId], references: [id])
+  bookingId         String?
+  booking           ServiceBooking?   @relation(fields: [bookingId], references: [id])
+  amount            Decimal           @db.Decimal(10, 2)
+  currency          String            @default("TRY")
+  provider          PaymentProvider
+  providerPaymentId String?
+  providerStatus    String?
+  status            PaymentStatus
+  method            PaymentMethodType
+  last4             String?
+  cardBrand         String?
+  installments      Int               @default(1)
+  refunds           Refund[]
+  metadata          Json?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+}
+
+model Refund {
+  id               String   @id @default(cuid())
+  paymentId        String
+  payment          Payment  @relation(fields: [paymentId], references: [id])
+  amount           Decimal  @db.Decimal(10, 2)
+  reason           String?
+  providerRefundId String?
+  status           String   // "pending", "succeeded", "failed"
+  initiatedBy      String
+  createdAt        DateTime @default(now())
+}
+
+model Invoice {
+  id             String          @id @default(cuid())
+  orderId        String?         @unique
+  order          Order?          @relation(fields: [orderId], references: [id])
+  bookingId      String?         @unique
+  booking        ServiceBooking? @relation(fields: [bookingId], references: [id])
+  invoiceNo      String          @unique
+  pdfUrl         String?
+  issuedAt       DateTime        @default(now())
+  totalAmount    Decimal         @db.Decimal(10, 2)
+  taxAmount      Decimal         @db.Decimal(10, 2)
+  taxRate        Decimal         @default(0.08) @db.Decimal(4, 2)
+  billingName    String
+  billingEmail   String
+  billingAddress String?
+  companyName    String?
+  taxNumber      String?
+  createdAt      DateTime        @default(now())
+}
+
+// ─── MARKETING & CAMPAIGNS ─────────────────────────────
+
+enum PopupType {
+  EMAIL_CAPTURE
+  DISCOUNT
+  ANNOUNCEMENT
+  EXIT_INTENT
+  COOKIE_CONSENT
+}
+
+enum PopupTrigger {
+  TIME_DELAY
+  SCROLL_DEPTH
+  EXIT_INTENT
+  PAGE_LOAD
+  CLICK
+}
+
+enum ReferralStatus {
+  PENDING
+  REGISTERED
+  CONVERTED
+  REWARDED
+}
+
+enum ABTestStatus {
+  DRAFT
+  RUNNING
+  PAUSED
+  COMPLETED
+}
+
+model Popup {
+  id               String       @id @default(cuid())
+  name             String
+  type             PopupType
+  title            String
+  subtitle         String?
+  body             String?
+  imageUrl         String?
+  ctaText          String?
+  ctaUrl           String?
+  inputPlaceholder String?
+  trigger          PopupTrigger
+  triggerDelay     Int?
+  triggerScroll    Int?
+  showOnPages      String[]
+  excludePages     String[]
+  showOnDevices    String[]
+  showOnce         Boolean      @default(true)
+  showAfterDays    Int?
+  maxShows         Int?
+  targetSegment    String?
+  newVisitorOnly   Boolean      @default(false)
+  position         String       @default("center")
+  bgColor          String       @default("#FFFFFF")
+  textColor        String       @default("#3D1A0A")
+  isActive         Boolean      @default(false)
+  validFrom        DateTime?
+  validUntil       DateTime?
+  impressions      Int          @default(0)
+  conversions      Int          @default(0)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+}
+
+model Banner {
+  id          String    @id @default(cuid())
+  name        String
+  content     String
+  linkUrl     String?
+  bgColor     String    @default("#C4622D")
+  textColor   String    @default("#FFFFFF")
+  isCloseable Boolean   @default(true)
+  position    String    @default("top")
+  isActive    Boolean   @default(false)
+  validFrom   DateTime?
+  validUntil  DateTime?
+  showOnPages String[]
+  priority    Int       @default(0)
+  clicks      Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Referral {
+  id             String         @id @default(cuid())
+  referrerId     String
+  referrer       User           @relation("ReferralsMade", fields: [referrerId], references: [id])
+  referredEmail  String
+  referredUserId String?        @unique
+  referredUser   User?          @relation("ReferralReceived", fields: [referredUserId], references: [id])
+  status         ReferralStatus @default(PENDING)
+  referrerReward Int            @default(0)
+  referredReward String?
+  convertedAt    DateTime?
+  createdAt      DateTime       @default(now())
+}
+
+model FlashSale {
+  id        String             @id @default(cuid())
+  name      String
+  startAt   DateTime
+  endAt     DateTime
+  isActive  Boolean            @default(false)
+  products  FlashSaleProduct[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
+model FlashSaleProduct {
+  id            String       @id @default(cuid())
+  flashSaleId   String
+  flashSale     FlashSale    @relation(fields: [flashSaleId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product      @relation(fields: [productId], references: [id])
+  discountType  DiscountType
+  discountValue Decimal      @db.Decimal(10, 2)
+  maxQuantity   Int?
+  soldCount     Int          @default(0)
+}
+
+model UTMClick {
+  id          String   @id @default(cuid())
+  source      String?
+  medium      String?
+  campaign    String?
+  term        String?
+  content     String?
+  landingPage String
+  sessionId   String?
+  userId      String?
+  orderId     String?
+  createdAt   DateTime @default(now())
+}
+
+model ABTest {
+  id              String          @id @default(cuid())
+  name            String
+  description     String?
+  status          ABTestStatus    @default(DRAFT)
+  variants        ABTestVariant[]
+  startAt         DateTime?
+  endAt           DateTime?
+  winnerVariantId String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model ABTestVariant {
+  id          String @id @default(cuid())
+  testId      String
+  test        ABTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+  name        String
+  weight      Int    @default(50)
+  config      Json
+  impressions Int    @default(0)
+  conversions Int    @default(0)
+}
+
+model Affiliate {
+  id              String        @id @default(cuid())
+  name            String
+  email           String        @unique
+  instagramHandle String?
+  tiktokHandle    String?
+  discountCodeId  String?       @unique
+  discountCode    DiscountCode? @relation(fields: [discountCodeId], references: [id])
+  commissionRate  Decimal       @default(0.10) @db.Decimal(4, 2)
+  totalSales      Decimal       @default(0) @db.Decimal(10, 2)
+  totalCommission Decimal       @default(0) @db.Decimal(10, 2)
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+}
+
+// ─── LOYALTY SYSTEM ────────────────────────────────────
+
+model LoyaltyConfig {
+  id                       String   @id @default(cuid())
+  isActive                 Boolean  @default(true)
+  programName              String   @default("Sofra Dostu")
+  programDescription       String?
+  pointsPerSpend           Decimal  @default(1.0) @db.Decimal(6, 2)
+  spendPerPoints           Decimal  @default(100.0) @db.Decimal(8, 2)
+  pointsToTLRate           Decimal  @default(1.0) @db.Decimal(6, 2)
+  minPointsToRedeem        Int      @default(50)
+  maxRedeemPercent         Int      @default(50)
+  pointsExpireEnabled      Boolean  @default(false)
+  pointsExpireDays         Int      @default(365)
+  bonusFirstOrder          Boolean  @default(true)
+  bonusFirstOrderPoints    Int      @default(50)
+  bonusReview              Boolean  @default(true)
+  bonusReviewPoints        Int      @default(10)
+  bonusPhotoReview         Boolean  @default(true)
+  bonusPhotoReviewPoints   Int      @default(20)
+  bonusReferral            Boolean  @default(true)
+  bonusReferralPoints      Int      @default(50)
+  bonusBirthday            Boolean  @default(true)
+  bonusBirthdayPoints      Int      @default(100)
+  bonusNewsletter          Boolean  @default(true)
+  bonusNewsletterPoints    Int      @default(5)
+  bonusProfileComplete     Boolean  @default(true)
+  bonusProfileCompletePoints Int    @default(15)
+  tiersEnabled             Boolean  @default(true)
+  bronzeMin                Int      @default(0)
+  silverMin                Int      @default(500)
+  goldMin                  Int      @default(1500)
+  bronzeBenefits           Json     @default("[]")
+  silverBenefits           Json     @default("[]")
+  goldBenefits             Json     @default("[]")
+  bronzeMultiplier         Decimal  @default(1.0) @db.Decimal(4, 2)
+  silverMultiplier         Decimal  @default(1.2) @db.Decimal(4, 2)
+  goldMultiplier           Decimal  @default(1.5) @db.Decimal(4, 2)
+  bronzeFreeShipping       Decimal? @db.Decimal(8, 2)
+  silverFreeShipping       Decimal? @db.Decimal(8, 2)
+  goldFreeShipping         Decimal? @db.Decimal(8, 2)
+  silverEarlyAccess        Boolean  @default(false)
+  goldEarlyAccess          Boolean  @default(true)
+  showPointsOnSite         Boolean  @default(true)
+  showTiersOnSite          Boolean  @default(true)
+  showLeaderboard          Boolean  @default(false)
+  updatedAt                DateTime @updatedAt
+  updatedBy                String?
+}
+
+model LoyaltyRedemptionBlock {
+  id          String    @id @default(cuid())
+  userId      String?
+  reason      String
+  blockedBy   String
+  unblockedAt DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model PointsMultiplierCampaign {
+  id             String   @id @default(cuid())
+  name           String
+  multiplier     Decimal  @db.Decimal(4, 2)
+  startAt        DateTime
+  endAt          DateTime
+  isActive       Boolean  @default(true)
+  appliesTo      String   @default("all")
+  categoryId     String?
+  minOrderAmount Decimal? @db.Decimal(8, 2)
+  createdAt      DateTime @default(now())
+}
+
+model TierDiscount {
+  id         String      @id @default(cuid())
+  tier       LoyaltyTier
+  productId  String?
+  categoryId String?
+  discount   Decimal     @db.Decimal(5, 2)
+  isActive   Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+}
+
+model NotificationPreference {
+  id                  String  @id @default(cuid())
+  userId              String  @unique
+  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailOrderUpdates   Boolean @default(true)
+  emailBookingUpdates Boolean @default(true)
+  emailMarketing      Boolean @default(false)
+  emailNewsletter     Boolean @default(false)
+  emailBirthday       Boolean @default(true)
+  emailLoyalty        Boolean @default(true)
+  emailWinback        Boolean @default(false)
+  smsOrderUpdates     Boolean @default(true)
+  smsBookingUpdates   Boolean @default(true)
+  smsMarketing        Boolean @default(false)
+  smsBookingReminder  Boolean @default(true)
+  pushEnabled         Boolean @default(false)
+  pushOrderUpdates    Boolean @default(true)
+  pushPromotions      Boolean @default(false)
+  updatedAt           DateTime @updatedAt
+}
+
+model Survey {
+  id        String           @id @default(cuid())
+  name      String
+  trigger   String
+  questions Json
+  isActive  Boolean          @default(true)
+  responses SurveyResponse[]
+  createdAt DateTime         @default(now())
+}
+
+model SurveyResponse {
+  id        String   @id @default(cuid())
+  surveyId  String
+  survey    Survey   @relation(fields: [surveyId], references: [id])
+  userId    String?
+  orderId   String?
+  bookingId String?
+  answers   Json
+  npsScore  Int?
+  createdAt DateTime @default(now())
 }

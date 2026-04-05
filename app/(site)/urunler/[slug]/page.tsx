@@ -44,7 +44,7 @@ export default function ProductDetailPage({ params }: Props) {
         </div>
 
         <ProductDescription product={product} />
-        <ProductReviews avgRating={product.avgRating} reviewCount={product.reviewCount} />
+        <ProductReviews productSlug={product.slug} />
       </section>
 
       <CrossSellProducts productId={product.id} categoryId={product.categoryId} />

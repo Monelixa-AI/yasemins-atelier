@@ -2,10 +2,20 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Package, Calendar, Heart, MapPin, Star, User } from "lucide-react";
+import { Package, Calendar, Heart, MapPin, Star, User, FileText } from "lucide-react";
 import { useWishlistStore } from "@/store/wishlist";
 import { products } from "@/lib/data/products";
 import ProductCard from "@/components/site/product/ProductCard";
+
+interface OrderRow {
+  id: string
+  orderNumber: string
+  total: string
+  status: string
+  paymentStatus: string
+  createdAt: string
+  adminNote: string | null
+}
 
 const tabs = [
   { id: "orders", label: "Siparişlerim", icon: Package },
@@ -41,16 +51,7 @@ export default function HesabimPage() {
 
         {/* Content */}
         <div>
-          {activeTab === "orders" && (
-            <div>
-              <h2 className="font-heading text-2xl text-brown-deep mb-6">Siparişlerim</h2>
-              <div className="bg-cream p-8 text-center">
-                <Package size={40} className="text-gold-light mx-auto mb-3" />
-                <p className="font-body text-sm text-brown-mid">Henüz siparişiniz yok.</p>
-                <Link href="/menu" className="inline-block mt-4 font-body text-sm text-terracotta hover:text-terracotta-dark underline underline-offset-4">Menüyü Keşfet</Link>
-              </div>
-            </div>
-          )}
+          {activeTab === "orders" && <OrdersTab />}
 
           {activeTab === "bookings" && (
             <div>
@@ -120,4 +121,83 @@ export default function HesabimPage() {
       </div>
     </div>
   );
+}
+
+/* ── Orders Tab with invoice download ── */
+
+const STATUS_MAP: Record<string, { label: string; color: string }> = {
+  PENDING: { label: "Bekliyor", color: "bg-yellow-100 text-yellow-700" },
+  CONFIRMED: { label: "Onaylandı", color: "bg-blue-100 text-blue-700" },
+  PREPARING: { label: "Hazırlanıyor", color: "bg-indigo-100 text-indigo-700" },
+  READY: { label: "Hazır", color: "bg-teal-100 text-teal-700" },
+  OUT_FOR_DELIVERY: { label: "Yolda", color: "bg-cyan-100 text-cyan-700" },
+  DELIVERED: { label: "Teslim Edildi", color: "bg-green-100 text-green-700" },
+  CANCELLED: { label: "İptal", color: "bg-red-100 text-red-700" },
+  REFUNDED: { label: "İade", color: "bg-purple-100 text-purple-700" },
+}
+
+function OrdersTab() {
+  const [orders, setOrders] = useState<OrderRow[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // In a real app, this would fetch user's orders
+    // For now, show the empty state
+    setLoading(false)
+  }, [])
+
+  if (loading) {
+    return <div className="text-center py-8 text-brown-mid font-body text-sm">Yükleniyor...</div>
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div>
+        <h2 className="font-heading text-2xl text-brown-deep mb-6">Siparişlerim</h2>
+        <div className="bg-cream p-8 text-center">
+          <Package size={40} className="text-gold-light mx-auto mb-3" />
+          <p className="font-body text-sm text-brown-mid">Henüz siparişiniz yok.</p>
+          <Link href="/menu" className="inline-block mt-4 font-body text-sm text-terracotta hover:text-terracotta-dark underline underline-offset-4">Menüyü Keşfet</Link>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <h2 className="font-heading text-2xl text-brown-deep mb-6">Siparişlerim</h2>
+      <div className="space-y-4">
+        {orders.map((order) => {
+          const status = STATUS_MAP[order.status] || { label: order.status, color: "bg-gray-100 text-gray-600" }
+          return (
+            <div key={order.id} className="border border-gold-light p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-1">
+                  <span className="font-mono text-sm font-medium text-brown-deep">{order.orderNumber}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${status.color}`}>{status.label}</span>
+                </div>
+                <p className="font-body text-xs text-brown-mid">
+                  {new Date(order.createdAt).toLocaleDateString("tr-TR")} — {parseFloat(order.total).toFixed(0)}₺
+                </p>
+                {order.adminNote && order.adminNote.startsWith("Kargo:") && (
+                  <p className="font-body text-xs text-cyan-600 mt-1">{order.adminNote}</p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                {(order.paymentStatus === "PAID" || order.paymentStatus === "PARTIALLY_REFUNDED") && (
+                  <a
+                    href={`/api/invoices/${order.id}`}
+                    className="inline-flex items-center gap-1.5 border border-terracotta text-terracotta font-body text-xs px-3 py-2 hover:bg-terracotta hover:text-white transition-colors"
+                  >
+                    <FileText size={14} />
+                    Fatura İndir
+                  </a>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
 }
