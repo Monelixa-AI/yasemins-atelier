@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { Header, Footer, WhatsAppButton, CookieConsent, AnalyticsProvider } from "@/components/site/layout";
 import CartDrawer from "@/components/site/cart/CartDrawer";
-import ChatWidget from "@/components/site/chat/ChatWidget";
-import PopupManager from "@/components/site/popups/PopupManager";
-import SiteBanner from "@/components/site/layout/SiteBanner";
-import UTMTracker from "@/components/site/UTMTracker";
-import FlashSaleBar from "@/components/site/flash/FlashSaleBar";
-import TikTokPixel from "@/components/site/TikTokPixel";
 import { JsonLd } from "@/components/site/JsonLd";
 import { getOrganizationSchema, getLocalBusinessSchema } from "@/lib/structured-data";
 import { defaultMetadata } from "@/lib/metadata";
+
+const ChatWidget = dynamic(() => import("@/components/site/chat/ChatWidget"), { ssr: false });
+const PopupManager = dynamic(() => import("@/components/site/popups/PopupManager"), { ssr: false });
+const SiteBanner = dynamic(() => import("@/components/site/layout/SiteBanner"), { ssr: false });
+const UTMTracker = dynamic(() => import("@/components/site/UTMTracker"), { ssr: false });
+const FlashSaleBar = dynamic(() => import("@/components/site/flash/FlashSaleBar"), { ssr: false });
+const TikTokPixel = dynamic(() => import("@/components/site/TikTokPixel"), { ssr: false });
 
 export const metadata: Metadata = defaultMetadata;
 

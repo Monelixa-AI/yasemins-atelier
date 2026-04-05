@@ -1,8 +1,9 @@
 "use client"
 
+import { Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { CheckCircle, Mail, Heart } from "lucide-react"
+import { CheckCircle, Mail, Heart, Loader2 } from "lucide-react"
 
 const MESSAGES: Record<string, { icon: typeof CheckCircle; title: string; desc: string }> = {
   newsletter: {
@@ -17,7 +18,7 @@ const MESSAGES: Record<string, { icon: typeof CheckCircle; title: string; desc: 
   },
 }
 
-export default function ThankYouPage() {
+function ThankYouContent() {
   const searchParams = useSearchParams()
   const type = searchParams.get("type") || "default"
   const config = MESSAGES[type] || MESSAGES.default
@@ -37,5 +38,19 @@ export default function ThankYouPage() {
         Ana Sayfaya Dön
       </Link>
     </div>
+  )
+}
+
+export default function ThankYouPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <Loader2 size={40} className="animate-spin text-terracotta" />
+        </div>
+      }
+    >
+      <ThankYouContent />
+    </Suspense>
   )
 }

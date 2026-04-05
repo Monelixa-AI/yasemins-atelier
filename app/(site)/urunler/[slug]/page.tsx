@@ -1,12 +1,14 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { products } from "@/lib/data/products";
 import ProductBreadcrumb from "@/components/site/product/ProductBreadcrumb";
 import ProductGallery from "@/components/site/product/ProductGallery";
 import ProductInfo from "@/components/site/product/ProductInfo";
 import ProductDescription from "@/components/site/product/ProductDescription";
-import ProductReviews from "@/components/site/product/ProductReviews";
 import CrossSellProducts from "@/components/site/product/CrossSellProducts";
+
+const ProductReviews = dynamic(() => import("@/components/site/product/ProductReviews"), { ssr: false });
 
 interface Props {
   params: { slug: string };

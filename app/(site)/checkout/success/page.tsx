@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { PartyPopper, Loader2, MessageCircle } from "lucide-react"
 import confetti from "canvas-confetti"
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const searchParams = useSearchParams()
   const orderId = searchParams.get("orderId")
   const paymentIntent = searchParams.get("payment_intent")
@@ -100,5 +100,20 @@ export default function CheckoutSuccessPage() {
         </Link>
       </div>
     </div>
+  )
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[60vh] flex flex-col items-center justify-center">
+          <Loader2 size={40} className="animate-spin text-terracotta" />
+          <p className="font-body text-sm text-brown-mid mt-4">Yükleniyor...</p>
+        </div>
+      }
+    >
+      <CheckoutSuccessContent />
+    </Suspense>
   )
 }

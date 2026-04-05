@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -67,7 +67,7 @@ function calcDiscountPercent(
   return 0;
 }
 
-export default function FlashSalePage() {
+function FlashSaleContent() {
   const router = useRouter();
   const [data, setData] = useState<FlashSaleData | null>(null);
   const [remaining, setRemaining] = useState<number>(0);
@@ -272,5 +272,19 @@ export default function FlashSalePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function FlashSalePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#C4622D]" />
+        </div>
+      }
+    >
+      <FlashSaleContent />
+    </Suspense>
   );
 }
