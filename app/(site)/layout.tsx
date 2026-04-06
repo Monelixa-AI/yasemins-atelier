@@ -27,7 +27,7 @@ export default function SiteLayout({
       <Header />
       <SiteBanner />
       <FlashSaleBar />
-      <main className="pt-[90px]">{children}</main>
+      <main id="main-content" className="pt-[90px]">{children}</main>
       <Footer />
       <CartDrawer />
       <ChatWidget />
