@@ -170,8 +170,13 @@ export default function ProductReviews({
   const fetchReviews = useCallback(() => {
     setLoading(true);
     fetch(`/api/products/${productSlug}/reviews`)
-      .then((r) => r.json())
-      .then((d) => setData(d))
+      .then((r) => {
+        if (!r.ok) return null;
+        return r.json();
+      })
+      .then((d) => {
+        if (d) setData(d);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [productSlug]);
