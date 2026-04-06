@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Header, Footer, WhatsAppButton, CookieConsent, AnalyticsProvider } from "@/components/site/layout";
 import CartDrawer from "@/components/site/cart/CartDrawer";
 import { JsonLd } from "@/components/site/JsonLd";
@@ -37,6 +39,8 @@ export default function SiteLayout({
       <CookieConsent />
       <PopupManager />
       <UTMTracker />
+      <Analytics />
+      <SpeedInsights />
     </>
   );
 }

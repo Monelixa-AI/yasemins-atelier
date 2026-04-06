@@ -1,0 +1,34 @@
+name: Scheduled Jobs
+
+on:
+  schedule:
+    - cron: "0 8 * * *"    # daily 08:00 UTC
+    - cron: "0 10 * * *"   # reminders 10:00
+    - cron: "0 3 * * *"    # expire-points 03:00
+    - cron: "0 8 * * 1"    # weekly-report Monday
+    - cron: "0 8 1 * *"    # monthly-report 1st
+  workflow_dispatch:
+
+jobs:
+  run-crons:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Daily cron
+        if: github.event.schedule == '0 8 * * *'
+        run: curl -s -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/daily
+
+      - name: Reminders
+        if: github.event.schedule == '0 10 * * *'
+        run: curl -s -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/reminders
+
+      - name: Expire points
+        if: github.event.schedule == '0 3 * * *'
+        run: curl -s -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/expire-points
+
+      - name: Weekly report
+        if: github.event.schedule == '0 8 * * 1'
+        run: curl -s -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/weekly-report
+
+      - name: Monthly report
+        if: github.event.schedule == '0 8 1 * *'
+        run: curl -s -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/monthly-report
