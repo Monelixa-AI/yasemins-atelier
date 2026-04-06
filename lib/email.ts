@@ -14,7 +14,13 @@ import LoyaltyLevelUp from "@/emails/LoyaltyLevelUp"
 import WinBack from "@/emails/WinBackEmail"
 import Birthday from "@/emails/BirthdayEmail"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let _resend: Resend | null = null
+function getResend(): Resend {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder")
+  }
+  return _resend
+}
 
 const FROM_EMAIL = process.env.FROM_EMAIL || "Yasemin's Atelier <info@yaseminsatelier.com>"
 
@@ -29,7 +35,7 @@ export async function sendEmail(
   try {
     const html = await render(template)
 
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: FROM_EMAIL,
       to,
       subject,
