@@ -51,7 +51,11 @@
       "Bash(mkdir -p \"app/api/corporate/orders/[orderId]/approve\")",
       "Bash(mkdir -p \"app/api/corporate/orders/[orderId]/reject\")",
       "Bash(ls -la \"C:\\\\Users\\\\Sonat\\\\Documents\\\\VS-CODE-PROJECTS\\\\YASE_ATELIER\\\\YASE_ATELIER_VS\\\\yasemins-atelier\\\\emails\\\\Corporate\"*.tsx)",
-      "Bash(git commit -m ':*)"
+      "Bash(git commit -m ':*)",
+      "Bash([ ! -f \"/c/Users/Sonat/Documents/VS-CODE-PROJECTS/YASE_ATELIER/YASE_ATELIER_VS/yasemins-atelier/app/admin/\\\\\\(panel\\\\\\)/$page/page.tsx\" ])",
+      "Bash(grep -l \"EmailLayout\" /c/Users/Sonat/Documents/VS-CODE-PROJECTS/YASE_ATELIER/YASE_ATELIER_VS/yasemins-atelier/emails/*.tsx)",
+      "Bash(ls -la /c/Users/Sonat/Documents/VS-CODE-PROJECTS/YASE_ATELIER/YASE_ATELIER_VS/yasemins-atelier/sentry*)",
+      "Bash(ls -la /c/Users/Sonat/Documents/VS-CODE-PROJECTS/YASE_ATELIER/YASE_ATELIER_VS/yasemins-atelier/*.json /c/Users/Sonat/Documents/VS-CODE-PROJECTS/YASE_ATELIER/YASE_ATELIER_VS/yasemins-atelier/tsconfig.json)"
     ]
   }
 }
