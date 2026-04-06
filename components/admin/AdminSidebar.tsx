@@ -9,7 +9,7 @@ import {
   FileText, FileEdit, Image, Target, ChefHat,
   Users, Tags, Star,
   Megaphone, Mail, MessageSquare, Bell,
-  Calendar, Truck, Settings, BarChart3,
+  Calendar, Truck, Settings, BarChart3, Shield,
   ExternalLink, Menu, X,
 } from "lucide-react"
 
@@ -72,6 +72,7 @@ const NAV_GROUPS = [
     items: [
       { href: "/admin/musaitlik", icon: Calendar, label: "Müsaitlik" },
       { href: "/admin/teslimat", icon: Truck, label: "Teslimat" },
+      { href: "/admin/hukuki", icon: Shield, label: "Hukuki" },
       { href: "/admin/ayarlar", icon: Settings, label: "Ayarlar" },
       { href: "/admin/raporlar", icon: BarChart3, label: "Raporlar" },
     ],
