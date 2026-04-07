@@ -1,12 +1,20 @@
+# Scheduled Jobs — DISABLED until production secrets are configured
+# To enable: uncomment the schedule section and add CRON_SECRET to GitHub Secrets
+#
+# Required GitHub Secrets:
+#   CRON_SECRET — must match the CRON_SECRET env var on Vercel
+#
+# Required: yaseminsatelier.com must be live and responding
+
 name: Scheduled Jobs
 
 on:
-  schedule:
-    - cron: "0 8 * * *"    # daily 08:00 UTC
-    - cron: "0 10 * * *"   # reminders 10:00
-    - cron: "0 3 * * *"    # expire-points 03:00
-    - cron: "0 8 * * 1"    # weekly-report Monday
-    - cron: "0 8 1 * *"    # monthly-report 1st
+  # schedule:
+  #   - cron: "0 8 * * *"    # daily 08:00 UTC
+  #   - cron: "0 10 * * *"   # reminders 10:00
+  #   - cron: "0 3 * * *"    # expire-points 03:00
+  #   - cron: "0 8 * * 1"    # weekly-report Monday
+  #   - cron: "0 8 1 * *"    # monthly-report 1st
   workflow_dispatch:
 
 jobs:
@@ -14,21 +22,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Daily cron
-        if: github.event.schedule == '0 8 * * *'
-        run: curl -s -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/daily
+        run: curl -sf -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/daily || echo "Skipped — not configured"
 
       - name: Reminders
-        if: github.event.schedule == '0 10 * * *'
-        run: curl -s -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/reminders
+        run: curl -sf -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/reminders || echo "Skipped"
 
       - name: Expire points
-        if: github.event.schedule == '0 3 * * *'
-        run: curl -s -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/expire-points
+        run: curl -sf -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/expire-points || echo "Skipped"
 
       - name: Weekly report
-        if: github.event.schedule == '0 8 * * 1'
-        run: curl -s -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/weekly-report
+        run: curl -sf -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/weekly-report || echo "Skipped"
 
       - name: Monthly report
-        if: github.event.schedule == '0 8 1 * *'
-        run: curl -s -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/monthly-report
+        run: curl -sf -H "Authorization:Bearer ${{ secrets.CRON_SECRET }}" https://yaseminsatelier.com/api/cron/monthly-report || echo "Skipped"
