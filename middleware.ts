@@ -1,73 +1,70 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth, adminAuth } from "@/lib/auth";
+import { jwtVerify } from "jose";
 import { rateLimits, checkRateLimit } from "@/lib/rate-limit";
+
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.NEXTAUTH_SECRET || "fallback-secret-change-in-production"
+);
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // --- Rate Limiting (before auth) ---
+  // --- Rate Limiting ---
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     request.headers.get("x-real-ip") ||
     "anonymous";
 
-  // Password reset (more specific path — check before general auth)
   if (pathname === "/api/auth/forgot-password" || pathname === "/api/auth/reset-password") {
     const { success } = await checkRateLimit(rateLimits.passwordReset, ip);
     if (!success) {
       return NextResponse.json(
-        { error: "Cok fazla istek gonderdiniz. Lutfen daha sonra tekrar deneyin." },
+        { error: "Çok fazla istek. Lütfen daha sonra tekrar deneyin." },
         { status: 429 }
       );
     }
-  }
-  // Auth endpoints
-  else if (pathname.startsWith("/api/auth")) {
+  } else if (pathname.startsWith("/api/auth") && !pathname.startsWith("/api/admin/auth")) {
     const { success } = await checkRateLimit(rateLimits.auth, ip);
     if (!success) {
       return NextResponse.json(
-        { error: "Cok fazla giris denemesi. Lutfen 15 dakika sonra tekrar deneyin." },
+        { error: "Çok fazla giriş denemesi. 15 dakika sonra tekrar deneyin." },
         { status: 429 }
       );
     }
-  }
-  // Chat endpoint
-  else if (pathname === "/api/chat") {
+  } else if (pathname === "/api/chat") {
     const { success } = await checkRateLimit(rateLimits.chat, ip);
     if (!success) {
       return NextResponse.json(
-        { error: "Sohbet limiti asildi. Lutfen daha sonra tekrar deneyin." },
+        { error: "Sohbet limiti aşıldı." },
         { status: 429 }
       );
     }
-  }
-  // Payment endpoints
-  else if (pathname.startsWith("/api/payments")) {
+  } else if (pathname.startsWith("/api/payments")) {
     const { success } = await checkRateLimit(rateLimits.payment, ip);
     if (!success) {
       return NextResponse.json(
-        { error: "Cok fazla odeme istegi. Lutfen daha sonra tekrar deneyin." },
+        { error: "Çok fazla ödeme isteği." },
         { status: 429 }
       );
     }
   }
 
-  // --- Existing Auth Logic ---
-
-  // Admin routes: require admin session
+  // --- Admin Auth (JWT cookie) ---
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
-    const session = await adminAuth();
-    if (!session) {
+    const token = request.cookies.get("admin-token")?.value;
+
+    if (!token) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
-  }
 
-  // User account routes: require user session
-  if (pathname.startsWith("/hesabim")) {
-    const session = await auth();
-    if (!session) {
-      return NextResponse.redirect(new URL("/giris", request.url));
+    try {
+      await jwtVerify(token, JWT_SECRET);
+    } catch {
+      // Token invalid or expired
+      const response = NextResponse.redirect(new URL("/admin/login", request.url));
+      response.cookies.delete("admin-token");
+      return response;
     }
   }
 
@@ -77,7 +74,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/admin/:path*",
-    "/hesabim/:path*",
     "/api/auth/:path*",
     "/api/chat",
     "/api/payments/:path*",
