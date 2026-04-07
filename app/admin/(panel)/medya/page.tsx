@@ -29,7 +29,7 @@ interface MediaItem {
 }
 
 interface MediaResponse {
-  items: MediaItem[]
+  media: MediaItem[]
   total: number
 }
 
@@ -135,7 +135,7 @@ export default function AdminMediaPage() {
           prev
             ? {
                 ...prev,
-                items: prev.items.map((it) =>
+                media: prev.media.map((it) =>
                   it.id === updated.id ? updated : it
                 ),
               }
@@ -254,7 +254,7 @@ export default function AdminMediaPage() {
                 />
               ))}
             </div>
-          ) : !data || data.items.length === 0 ? (
+          ) : !data || data.media.length === 0 ? (
             <div className="bg-white border rounded-xl p-12 text-center">
               <ImageIcon size={40} className="mx-auto text-gray-300 mb-3" />
               <p className="text-sm text-gray-400">
@@ -264,7 +264,7 @@ export default function AdminMediaPage() {
           ) : viewMode === "grid" ? (
             /* ---- GRID VIEW ---- */
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-              {data.items.map((item) => (
+              {data.media.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => handleSelect(item)}
@@ -323,7 +323,7 @@ export default function AdminMediaPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {data.items.map((item) => (
+                  {data.media.map((item) => (
                     <tr
                       key={item.id}
                       onClick={() => handleSelect(item)}
