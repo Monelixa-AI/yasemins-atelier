@@ -58,7 +58,8 @@
       "Bash(ls -la /c/Users/Sonat/Documents/VS-CODE-PROJECTS/YASE_ATELIER/YASE_ATELIER_VS/yasemins-atelier/*.json /c/Users/Sonat/Documents/VS-CODE-PROJECTS/YASE_ATELIER/YASE_ATELIER_VS/yasemins-atelier/tsconfig.json)",
       "Bash(git commit -m 'fix: disable CI workflow until GitHub Secrets are configured:*)",
       "Bash(node -e \"const bcrypt = require\\('bcryptjs'\\); bcrypt.hash\\('Yase1234!', 12\\).then\\(h => console.log\\(h\\)\\)\")",
-      "Bash(npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' -e ':*)"
+      "Bash(npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' -e ':*)",
+      "Bash(node scripts/seed-products.js)"
     ]
   }
 }
